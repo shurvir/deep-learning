@@ -1,0 +1,24 @@
+answerIndicator = False
+question = ''
+answer = ''
+trainData = []
+
+for i in range(36,37):
+    events = [(d['sender_id']['gaia_id'], d) for d in data['conversations'][36]['events'] if 'chat_message' in d.keys()]
+    chat_messages = [(d[0], d[1]['chat_message']['message_content']) for d in events]
+    segments = [(d[0], d[1]['segment']) for d in chat_messages if 'segment' in d[1].keys()]
+    lines = [(d[0], ' '.join([x['text'] for x in d[1] if 'text' in x.keys()])) for d in segments]
+    for line in lines:
+        if line[0] !=  '100576270499250520268':
+            if answerIndicator:
+                trainData.append((question, answer))
+                question = ''
+                answer = ''
+                answerIndicator = False
+            question += line[1] + ' '
+        else:
+            answer += line[1] + ' '
+            answerIndicator = True
+    trainData += trainData[1:]
+
+trainData
